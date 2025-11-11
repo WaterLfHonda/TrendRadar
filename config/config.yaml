@@ -1,0 +1,16 @@
+run:
+  mode: daily
+  cron: "0 * * * *"
+weight:
+  rank_weight: 0.4
+  frequency_weight: 0.5
+  hotness_weight: 0.1
+platforms:
+  - id: "baidu"
+    name: "百度热搜"
+  - id: "zhihu"
+    name: "知乎"
+  - id: "rss_bestblogs"
+    name: "BestBlogs 技术精选"
+    url: "https://raw.githubusercontent.com/ginobefun/BestBlogs/main/BestBlogs_RSS_Articles.opml"
+    type: "rss"
