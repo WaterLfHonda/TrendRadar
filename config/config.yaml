@@ -5,6 +5,7 @@ weight:
   rank_weight: 0.4
   frequency_weight: 0.5
   hotness_weight: 0.1
+  time_decay_half_life_minutes: 180
 platforms:
 - id: baidu
   name: 百度热搜

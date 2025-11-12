@@ -32,3 +32,12 @@ Lightweight bootstrap of a news/trend aggregator. This initialization provides:
   - `NTFY_TOPIC`, `NTFY_SERVER_URL`（ntfy）
   - `OPENAI_API_KEY`（若启用 AI 摘要）
 
+
+## 运行状态与访问
+- 工作流名称：Hot News Crawler（每小时 + 手动触发）
+- 手动触发：Actions → Hot News Crawler → Run workflow
+- GitHub Pages：成功运行后自动部署到 `output/`
+- 访问：
+  - 根： https://waterlfhonda.github.io/TrendRadar/
+  - 最新： https://waterlfhonda.github.io/TrendRadar/latest.html
+

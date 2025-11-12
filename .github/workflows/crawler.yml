@@ -6,52 +6,51 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
 
+concurrency:
+  group: "pages-${{ github.ref }}"
+  cancel-in-progress: false
+
 jobs:
-  crawl-and-build:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
       - name: Install deps
         run: |
-          if [ -f requirements.txt ]; then
-            python -m pip install --upgrade pip
-            pip install -r requirements.txt
-          elif [ -f pyproject.toml ]; then
-            python -m pip install --upgrade pip
-            pip install uv || true
-            uv pip install -r requirements.txt || true
-          fi
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt || true
 
-      - name: Run TrendRadar
+      - name: Run crawler
         env:
-          TZ: Asia/Shanghai
+          RUN_MODE: "once"
         run: |
           python main.py
-
-      - name: Prepare Pages artifact
-        run: |
-          mkdir -p output
-          # 若脚本已生成 output/ 则跳过；否则兜底 index.html 以确保 Pages 有内容
-          [ -f output/index.html ] || echo "<h1>TrendRadar</h1><p>Build $(date -u)</p>" > output/index.html
+          test -f output/latest.html || echo '<h1>Pending data</h1>' > output/latest.html
+          echo '<meta http-equiv="refresh" content="0;url=latest.html">' > output/index.html
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: output
 
-  deploy-pages:
-    needs: crawl-and-build
+  deploy:
+    needs: build
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy to GitHub Pages
+      - id: deployment
         uses: actions/deploy-pages@v4
