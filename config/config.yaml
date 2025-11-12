@@ -1,16 +1,29 @@
 run:
   mode: daily
-  cron: "0 * * * *"
+  cron: 0 * * * *
 weight:
   rank_weight: 0.4
   frequency_weight: 0.5
   hotness_weight: 0.1
+  time_decay_half_life_minutes: 180
 platforms:
-  - id: "baidu"
-    name: "百度热搜"
-  - id: "zhihu"
-    name: "知乎"
-  - id: "rss_bestblogs"
-    name: "BestBlogs 技术精选"
-    url: "https://raw.githubusercontent.com/ginobefun/BestBlogs/main/BestBlogs_RSS_Articles.opml"
-    type: "rss"
+- id: baidu
+  name: 百度热搜
+- id: zhihu
+  name: 知乎
+- id: rss_bestblogs
+  name: BestBlogs 技术精选
+  url: https://raw.githubusercontent.com/ginobefun/BestBlogs/main/BestBlogs_RSS_Articles.opml
+  type: rss
+- id: weibo
+- id: toutiao
+- id: wallstreetcn-hot
+report:
+  mode: current
+  top_n: 50
+web:
+  enable: true
+  output_dir: output
+  page_title: TrendRadar — WaterLfHonda
+push:
+  enable: false

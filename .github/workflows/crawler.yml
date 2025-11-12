@@ -1,33 +1,56 @@
-name: TrendRadar Crawler
+name: Hot News Crawler
 
 on:
   schedule:
     - cron: "0 * * * *"
   workflow_dispatch:
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages-${{ github.ref }}"
+  cancel-in-progress: false
+
 jobs:
-  run-crawler:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
+          python-version: "3.11"
 
-      - name: Install dependencies
+      - name: Install deps
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r requirements.txt || true
 
-      - name: Run TrendRadar
-        run: python main.py
+      - name: Run crawler
+        env:
+          RUN_MODE: "once"
+        run: |
+          python main.py
+          test -f output/latest.html || echo '<h1>Pending data</h1>' > output/latest.html
+          echo '<meta http-equiv="refresh" content="0;url=latest.html">' > output/index.html
 
-      - name: Upload report artifact
-        if: always()
-        uses: actions/upload-artifact@v4
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: output-report
-          path: output/
+          path: output
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
